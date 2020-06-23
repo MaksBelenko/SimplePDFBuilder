@@ -59,7 +59,7 @@ public final class PDFBuilder {
     /// PDF Paper size rectangle
     private var pageRect: CGRect!
     /// PDF renderer context
-    private weak var pdfContext: UIGraphicsPDFRendererContext!
+    private var pdfContext: UIGraphicsPDFRendererContext!
 
     private let pdfHelper = PDFHelpers()
     private var pdfTextDrawer: PDFTextDrawer?
@@ -112,6 +112,8 @@ public final class PDFBuilder {
             
             context.beginPage() //new page
             self.pdfActions.generatePDF()
+            
+            pdfFooterDrawer?.drawFooterIfNeeded()
         }
 
         pdfTableDrawer?.releaseFuncReferences()
@@ -158,11 +160,11 @@ public final class PDFBuilder {
      - Parameter font: Font of the text ( Default is .systemFont(ofSize: 12) )
      */
     @discardableResult
-    public func addSingleLine(text: String, alignment: Alignment, font: UIFont = .systemFont(ofSize: 12)) -> PDFBuilder  {
+    public func addSingleLine(text: String, alignment: Alignment, font: UIFont = .systemFont(ofSize: 11), colour: UIColor = .black) -> PDFBuilder  {
         pdfActions.addAction { [unowned self] in
             self.checkOffset(forFont: font)
             guard let drawer = self.pdfTextDrawer else { return }
-            self.currentYOffset = drawer.drawSingleLineText(text: text, font: font, alignment: alignment, top: self.currentYOffset)
+            self.currentYOffset = drawer.drawSingleLineText(text: text, textColour: colour, font: font, alignment: alignment, top: self.currentYOffset)
         }
         
         return self
@@ -286,7 +288,7 @@ public final class PDFBuilder {
     private func checkOffset(forFont font: UIFont) {
         currentFont = font
         if (currentYOffset != pageOffset.top) {
-            currentYOffset += getCurrentFontHeight(forFont: font)
+            currentYOffset += lineSpacing * getCurrentFontHeight(forFont: font)
         }
     }
 
