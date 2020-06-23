@@ -68,7 +68,7 @@ internal final class PDFFooterDrawer {
      Numbers the page and increases the page counter
      */
     private func numberThePage(font: UIFont, colour: UIColor) {
-        let _ = pdfTextDrawer.drawSingleLineText(text: "Page: \(footer.pageNumber)", textColour: colour, font: font, alignment: .right, top: pageRect.height - pageOffset.bottom + 7)
+        let _ = pdfTextDrawer.drawSingleLineText(text: "Page: \(footer.pageNumber)", textColour: colour, font: font, alignment: .right, top: pageRect.height - pageOffset.bottom + 9)
         footer.pageNumber += 1
     }
 }

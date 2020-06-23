@@ -55,7 +55,24 @@ public final class PDFBuilder {
     private let pdfActions = PDFActions()
 
     /// offset in the PDF
-    private lazy var currentYOffset: CGFloat = pageOffset.top
+    private lazy var yOffset: CGFloat = pageOffset.top
+    /// Holds temprorary offset in case release of line happens
+    private var holdTmpYOffset: CGFloat = 0
+    
+    /// Getter and Setter for yOffset
+    private var currentYOffset: CGFloat {
+        get { return yOffset }
+        set {
+            if (holdOffset == false) {
+                yOffset = newValue
+            }
+            holdTmpYOffset = newValue
+        }
+    }
+    
+    /// Used to determine weather pdf page offset should or shouldn't change
+    private var holdOffset = false
+    
     /// PDF Paper size rectangle
     private var pageRect: CGRect!
     /// PDF renderer context
@@ -124,6 +141,38 @@ public final class PDFBuilder {
     
     // MARK: - Public methods
     
+    
+    /**
+     Allows to hold PDF line offset, therefore next objects will be drawn on the same line
+     
+     If you will set for PDF to hold the line, it means that all the next objects (text, images, etc.., except "addSpace")
+     will be drawn on the same line as the object before "holdPDFLine" method was executed
+     */
+    @discardableResult
+    public func holdLine() -> PDFBuilder {
+        pdfActions.addAction { [unowned self] in
+            self.holdOffset = true
+        }
+        
+        return self
+    }
+    
+    
+    /**
+     Releases the holding of the line in PDF (read summary of "holdPDFLine" method to understand better)
+     */
+    @discardableResult
+    public func releaseLine() -> PDFBuilder {
+        pdfActions.addAction { [unowned self] in
+            self.holdOffset = false
+            self.currentYOffset = self.holdTmpYOffset
+        }
+        
+        return self
+    }
+    
+    
+    
     /**
      Add space from previous object in the PDF
      - Parameter height: Height of the space in inches (= 2.54cm)
@@ -153,6 +202,21 @@ public final class PDFBuilder {
         return self
     }
     
+    
+    /**
+     Change paper margins for the next elements you will be adding
+     - Parameter margins: Paper margin type
+     */
+    @discardableResult
+    public func changePaperMargins(to margins: PaperMargins) -> PDFBuilder {
+        pdfActions.addAction { [unowned self] in
+            self.paperMargins = margins
+        }
+        
+        return self
+    }
+    
+    
     /**
      Adds single line of text to PDF
      - Parameter text: Text to add
@@ -160,11 +224,14 @@ public final class PDFBuilder {
      - Parameter font: Font of the text ( Default is .systemFont(ofSize: 12) )
      */
     @discardableResult
-    public func addSingleLine(text: String, alignment: Alignment, font: UIFont = .systemFont(ofSize: 11), colour: UIColor = .black) -> PDFBuilder  {
+    public func addSingleLineText(text: String, alignment: Alignment, font: UIFont = .systemFont(ofSize: 11), colour: UIColor = .black) -> PDFBuilder  {
         pdfActions.addAction { [unowned self] in
-            self.checkOffset(forFont: font)
+            self.currentFont = font
+            self.currentYOffset = self.checkOffset(forFont: font, offset: self.currentYOffset)
             guard let drawer = self.pdfTextDrawer else { return }
             self.currentYOffset = drawer.drawSingleLineText(text: text, textColour: colour, font: font, alignment: alignment, top: self.currentYOffset)
+            
+            self.holdTmpYOffset = self.checkOffset(forFont: self.currentFont, offset: self.holdTmpYOffset)
         }
         
         return self
@@ -181,11 +248,14 @@ public final class PDFBuilder {
     @discardableResult
     public func addMultiLineText(text: String, alignment: NSTextAlignment = .left, font: UIFont = .systemFont(ofSize: 12)) -> PDFBuilder {
         pdfActions.addAction { [unowned self] in
-            self.checkOffset(forFont: font)
+            self.currentFont = font
+            self.currentYOffset = self.checkOffset(forFont: font, offset: self.currentYOffset)
             let spacing = self.lineSpacing * self.getCurrentFontHeight(forFont: font)
             
             guard let drawer = self.pdfTextDrawer else { return }
             self.currentYOffset = drawer.drawWrappingText(text: text, font: font, lineSpacing: spacing, alignment: alignment, top: self.currentYOffset)
+            
+            self.holdTmpYOffset = self.checkOffset(forFont: self.currentFont, offset: self.holdTmpYOffset)
         }
         
         return self
@@ -280,16 +350,16 @@ public final class PDFBuilder {
     
     private func getCurrentFontHeight(forFont font: UIFont) -> CGFloat {
         let textAttributes = [NSAttributedString.Key.font: font]
-        let attributedText = NSAttributedString(string: "Test String", attributes: textAttributes)
+        let attributedText = NSAttributedString(string: "ooooo", attributes: textAttributes)
         return attributedText.size().height
     }
     
     
-    private func checkOffset(forFont font: UIFont) {
-        currentFont = font
-        if (currentYOffset != pageOffset.top) {
-            currentYOffset += lineSpacing * getCurrentFontHeight(forFont: font)
+    private func checkOffset(forFont font: UIFont, offset: CGFloat) -> CGFloat {
+        if (offset != pageOffset.top) {
+            return offset + lineSpacing * getCurrentFontHeight(forFont: font)
         }
+        return offset
     }
 
 }
