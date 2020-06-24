@@ -11,7 +11,7 @@ import UIKit.UIGraphicsImageRenderer
 internal final class PDFTableDrawer {
     
     // TODO: Update with the value of pageOffset in PDFBuilder
-    var pageOffset = PDFMargins(top: 72, left: 72, right: 72, bottom: 72)
+    var pageMargins: PDFMargins
     
     private typealias NoArgs = () -> ()
     private var startNewPage: NoArgs?
@@ -45,9 +45,11 @@ internal final class PDFTableDrawer {
     
     
     // MARK: - Initialisation
-    init(context: UIGraphicsPDFRendererContext, pageRect: CGRect, startNewPage: @escaping () -> ()) {
-        pdfContext = context
-        self.pageRect = pageRect
+    init(_ pageData: PageData, startNewPage: @escaping () -> ()) {
+        pdfContext = pageData.pdfContext
+        pageRect = pageData.pageRect
+        pageMargins = pageData.pageMargins
+        
         self.startNewPage = startNewPage
     }
     
@@ -195,8 +197,8 @@ internal final class PDFTableDrawer {
         drawContext.saveGState()
         
         drawContext.setFillColor(colour.cgColor)
-        let rectWidth = pageRect.width - (pageOffset.left + pageOffset.right)
-        let rect = CGRect(x: pageOffset.left, y: top, width: rectWidth, height: height)
+        let rectWidth = pageRect.width - (pageMargins.left + pageMargins.right)
+        let rect = CGRect(x: pageMargins.left, y: top, width: rectWidth, height: height)
         let roundedRect = UIBezierPath(roundedRect: rect, cornerRadius: 5).cgPath
         drawContext.addPath(roundedRect)
         drawContext.drawPath(using: .fill)
@@ -218,8 +220,8 @@ internal final class PDFTableDrawer {
         drawContext.saveGState()
         
         drawContext.setFillColor(colour.cgColor)
-        let rectWidth = pageRect.width - (pageOffset.left + pageOffset.right)
-        let rect = CGRect(x: pageOffset.left, y: top, width: rectWidth, height: height)
+        let rectWidth = pageRect.width - (pageMargins.left + pageMargins.right)
+        let rect = CGRect(x: pageMargins.left, y: top, width: rectWidth, height: height)
         let path = UIBezierPath(rect: rect).cgPath
         drawContext.addPath(path)
         drawContext.drawPath(using: .fill)
@@ -236,7 +238,7 @@ internal final class PDFTableDrawer {
     private func drawRowLines(height: CGFloat, top: CGFloat) {
         var points = columns.map { $0.offset }
         
-        points.append(pageRect.width - pageOffset.right - 0.5)
+        points.append(pageRect.width - pageMargins.right - 0.5)
         points[0] = points[0] + 0.5
         
         let drawContext = pdfContext.cgContext
@@ -320,9 +322,9 @@ internal final class PDFTableDrawer {
     private func checkPageBounds(rowHeight: CGFloat, top: CGFloat) -> CGFloat {
         var newTop = top
         
-        if (newTop > (pageRect.height - (rowHeight + pageOffset.bottom)) ) {
+        if (newTop > (pageRect.height - (rowHeight + pageMargins.bottom)) ) {
             startNewPage!()
-            newTop = pageOffset.top
+            newTop = pageMargins.top
         }
         
         return newTop
@@ -369,14 +371,14 @@ internal final class PDFTableDrawer {
      - Returns: TableColumn struct containing: x-offset, width and alignment of the table column
      */
     private func getSpacing(using headers: [PDFColumnHeader]) -> [TableColumn] {
-        let width = pageRect.width - (pageOffset.left + pageOffset.right)
+        let width = pageRect.width - (pageMargins.left + pageMargins.right)
         let columnsCount = headers.count
         
         let weightsTotal = CGFloat(headers.map { $0.weight }
                                           .reduce(0, +) )
         let minWeightWidth = width / weightsTotal
         
-        var tableColumns = [TableColumn(offset: pageOffset.left,
+        var tableColumns = [TableColumn(offset: pageMargins.left,
                                         width: minWeightWidth * CGFloat(headers[0].weight),
                                         alignment: headers[0].alignment )]
         for i in 1..<columnsCount {

@@ -27,10 +27,11 @@ public final class PDFBuilder {
     /// Paper margins type (Default is .Normal)
     public var paperMargins: PaperMargins = .Normal {
         didSet {
-            pageOffset = pdfHelper.marginsLookup(forMargins: paperMargins)
-            pdfTextDrawer?.pageOffset = pageOffset
-            pdfTableDrawer?.pageOffset = pageOffset
-            pdfFooterDrawer?.pageOffset = pageOffset
+            pageMargins = pdfHelper.marginsLookup(forMargins: paperMargins)
+            pdfTextDrawer?.pageMargins = pageMargins
+            pdfTableDrawer?.pageMargins = pageMargins
+            pdfImageDrawer?.pageMargins = pageMargins
+            pdfFooterDrawer?.pageMargins = pageMargins
         }
     }
 
@@ -47,7 +48,7 @@ public final class PDFBuilder {
     // MARK: - Private fields
     
     // Page margins containing top, left, right and bottom margins
-    private var pageOffset = PDFMargins(top: 72, left: 72, right: 72, bottom: 72) //Inch each
+    private var pageMargins = PDFMargins(top: 72, left: 72, right: 72, bottom: 72) //Inch each
     /// Current font
     private var currentFont = UIFont.systemFont(ofSize: 12)
 
@@ -55,7 +56,7 @@ public final class PDFBuilder {
     private let pdfActions = PDFActions()
 
     /// offset in the PDF
-    private lazy var yOffset: CGFloat = pageOffset.top
+    private lazy var yOffset: CGFloat = pageMargins.top
     /// Holds temprorary offset in case release of line happens
     private var holdTmpYOffset: CGFloat = 0
     
@@ -82,6 +83,7 @@ public final class PDFBuilder {
     private var pdfTextDrawer: PDFTextDrawer?
     private var pdfFooterDrawer: PDFFooterDrawer?
     private var pdfTableDrawer: PDFTableDrawer?
+    private var pdfImageDrawer: PDFImageDrawer?
 
         
     
@@ -123,9 +125,7 @@ public final class PDFBuilder {
         let data = renderer.pdfData { [unowned self] (context) in
             self.pdfContext = context
             
-            self.pdfTextDrawer = PDFTextDrawer(context: self.pdfContext, pageRect: self.pageRect)
-            self.pdfTableDrawer = PDFTableDrawer(context: self.pdfContext, pageRect: self.pageRect, startNewPage: self.startNewPDFPage)
-            self.pdfFooterDrawer = PDFFooterDrawer(context: self.pdfContext, pageRect: self.pageRect)
+            initialiseObjects()
             
             context.beginPage() //new page
             self.pdfActions.generatePDF()
@@ -136,6 +136,20 @@ public final class PDFBuilder {
         pdfTableDrawer?.releaseFuncReferences()
         
         return data
+    }
+    
+    
+    
+    /**
+     Initialise all objects to be used
+     */
+    private func initialiseObjects() {
+        let pageData = PageData(pdfContext: pdfContext, pageRect: pageRect, pageMargins: pageMargins)
+        
+        pdfTextDrawer = PDFTextDrawer(pageData)
+        pdfTableDrawer = PDFTableDrawer(pageData, startNewPage: self.startNewPDFPage)
+        pdfImageDrawer = PDFImageDrawer(pageData)
+        pdfFooterDrawer = PDFFooterDrawer(pageData)
     }
 
     
@@ -217,6 +231,7 @@ public final class PDFBuilder {
     }
     
     
+    
     /**
      Adds single line of text to PDF
      - Parameter text: Text to add
@@ -224,42 +239,19 @@ public final class PDFBuilder {
      - Parameter font: Font of the text ( Default is .systemFont(ofSize: 12) )
      */
     @discardableResult
-    public func addSingleLineText(text: String, alignment: Alignment, font: UIFont = .systemFont(ofSize: 11), colour: UIColor = .black) -> PDFBuilder  {
+    public func addText(text: String, alignment: Alignment, font: UIFont = .systemFont(ofSize: 11), colour: UIColor = .black) -> PDFBuilder  {
         pdfActions.addAction { [unowned self] in
-            self.currentFont = font
             self.currentYOffset = self.checkOffset(forFont: font, offset: self.currentYOffset)
             guard let drawer = self.pdfTextDrawer else { return }
-            self.currentYOffset = drawer.drawSingleLineText(text: text, textColour: colour, font: font, alignment: alignment, top: self.currentYOffset)
-            
+            let spacing = self.lineSpacing * self.getCurrentFontHeight(forFont: font)
+            self.currentYOffset = drawer.drawText(text: text, font: font, color: colour, lineSpacing: spacing, alignment: alignment, top: self.currentYOffset)
+
             self.holdTmpYOffset = self.checkOffset(forFont: self.currentFont, offset: self.holdTmpYOffset)
         }
-        
+
         return self
     }
     
-    /**
-    Adds multiple lines of text to PDF
-     
-     Use when you are writing a paragraph
-    - Parameter text: Text to be added
-    - Parameter alignment: Alignment of the text
-    - Parameter font: Font of the text ( Default is .systemFont(ofSize: 12) )
-    */
-    @discardableResult
-    public func addMultiLineText(text: String, alignment: NSTextAlignment = .left, font: UIFont = .systemFont(ofSize: 12)) -> PDFBuilder {
-        pdfActions.addAction { [unowned self] in
-            self.currentFont = font
-            self.currentYOffset = self.checkOffset(forFont: font, offset: self.currentYOffset)
-            let spacing = self.lineSpacing * self.getCurrentFontHeight(forFont: font)
-            
-            guard let drawer = self.pdfTextDrawer else { return }
-            self.currentYOffset = drawer.drawWrappingText(text: text, font: font, lineSpacing: spacing, alignment: alignment, top: self.currentYOffset)
-            
-            self.holdTmpYOffset = self.checkOffset(forFont: self.currentFont, offset: self.holdTmpYOffset)
-        }
-        
-        return self
-    }
 
     /**
      Add image to PDF
@@ -270,7 +262,7 @@ public final class PDFBuilder {
     @discardableResult
     public func addImage(image: UIImage, maxWidth: CGFloat, alignment: Alignment) -> PDFBuilder {
         pdfActions.addAction { [unowned self] in
-            guard let drawer = self.pdfTextDrawer else { return }
+            guard let drawer = self.pdfImageDrawer else { return }
             self.currentYOffset = drawer.drawImage(image: image, width: maxWidth, alignment: alignment, imageTop: self.currentYOffset)
         }
         
@@ -308,7 +300,9 @@ public final class PDFBuilder {
      - Parameter tableColour: Table colour theme ( Default is .darkGray )
      */
     @discardableResult
-    public func addTable(headers: [PDFColumnHeader], rows: [PDFTableRow], tableType: TableType = .Modern, font: UIFont = .systemFont(ofSize: 11), tableColour: UIColor = .darkGray) -> PDFBuilder {
+    public func addTable(headers: [PDFColumnHeader], rows: [PDFTableRow], tableType: TableType = .Modern, font: UIFont = .systemFont(ofSize: 11), tableColour: UIColor = .darkGray) throws -> PDFBuilder {
+        try validate(headers, rows)
+        
         pdfActions.addAction { [unowned self] in
             //TODO: Remove startnewpage and add footer method
             guard let drawer = self.pdfTableDrawer else { return }
@@ -326,7 +320,7 @@ public final class PDFBuilder {
     @discardableResult
     public func newPage() -> PDFBuilder {
         pdfActions.addAction { [unowned self] in
-            self.currentYOffset = self.pageOffset.top
+            self.currentYOffset = self.pageMargins.top
             self.startNewPDFPage()
         }
         
@@ -356,10 +350,21 @@ public final class PDFBuilder {
     
     
     private func checkOffset(forFont font: UIFont, offset: CGFloat) -> CGFloat {
-        if (offset != pageOffset.top) {
+        if (offset != pageMargins.top) {
             return offset + lineSpacing * getCurrentFontHeight(forFont: font)
         }
         return offset
     }
 
+    
+    
+    // MARK: - Validation
+        private func validate(_ headers: [PDFColumnHeader], _ rows: [PDFTableRow]) throws {
+            for row in rows {
+                guard headers.count >= row.count() else {
+                    throw PDFTableError.notEnoughHeaders
+                }
+            }
+        }
+    
 }

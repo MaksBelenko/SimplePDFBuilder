@@ -14,7 +14,7 @@ internal final class PDFFooterDrawer {
     private let pageRect: CGRect
     
     // TODO: Update with the value of pageOffset in PDFBuilder
-    var pageOffset = PDFMargins(top: 72, left: 72, right: 72, bottom: 72)
+    var pageMargins: PDFMargins
     
     /// Eables drawing of page footer
     var footer = PDFFooter(isEnabled: false, pagingEnabled: false, text: "", colour: .black)
@@ -22,10 +22,12 @@ internal final class PDFFooterDrawer {
     
     
     // MARK: - Initialisation
-    init(context: UIGraphicsPDFRendererContext, pageRect: CGRect) {
-        pdfContext = context
-        self.pageRect = pageRect
-        pdfTextDrawer = PDFTextDrawer(context: context, pageRect: pageRect)
+    init(_ pageData: PageData) {
+        pdfContext = pageData.pdfContext
+        pageRect = pageData.pageRect
+        pageMargins = pageData.pageMargins
+        
+        pdfTextDrawer = PDFTextDrawer(pageData)
     }
     
     
@@ -33,14 +35,14 @@ internal final class PDFFooterDrawer {
     
     func drawFooterIfNeeded() {
         if footer.isEnabled {
-            let top = pageRect.height - pageOffset.bottom
+            let top = pageRect.height - pageMargins.bottom
             
             let context = pdfContext.cgContext
             context.saveGState()
             
             context.setFillColor(footer.colour.cgColor)
-            let rectWidth = pageRect.width - (pageOffset.left + pageOffset.right)
-            let rect = CGRect(x: pageOffset.left, y: top, width: rectWidth, height: 0.25)
+            let rectWidth = pageRect.width - (pageMargins.left + pageMargins.right)
+            let rect = CGRect(x: pageMargins.left, y: top, width: rectWidth, height: 0.25)
             let path = UIBezierPath(rect: rect).cgPath
             context.addPath(path)
             context.drawPath(using: .fill)
@@ -48,12 +50,12 @@ internal final class PDFFooterDrawer {
             context.restoreGState()
             
             if footer.text != "" {
-                let _ = pdfTextDrawer.drawWrappingText(text: footer.text,
-                                                       font: .systemFont(ofSize: 9),
-                                                       color: footer.colour,
-                                                       lineSpacing: 0,
-                                                       alignment: .left,
-                                                       top: top + 12)
+                let _ = pdfTextDrawer.drawText(text: footer.text,
+                                               font: .systemFont(ofSize: 9),
+                                               color: footer.colour,
+                                               lineSpacing: 0,
+                                               alignment: .left,
+                                               top: top + 12)
             }
             
             if footer.pagingEnabled {
@@ -68,7 +70,7 @@ internal final class PDFFooterDrawer {
      Numbers the page and increases the page counter
      */
     private func numberThePage(font: UIFont, colour: UIColor) {
-        let _ = pdfTextDrawer.drawSingleLineText(text: "Page: \(footer.pageNumber)", textColour: colour, font: font, alignment: .right, top: pageRect.height - pageOffset.bottom + 9)
+        let _ = pdfTextDrawer.drawText(text: "\(footer.pageNumber)", font: font, color: colour, alignment: .right, top: pageRect.height - pageMargins.bottom + 12)
         footer.pageNumber += 1
     }
 }
