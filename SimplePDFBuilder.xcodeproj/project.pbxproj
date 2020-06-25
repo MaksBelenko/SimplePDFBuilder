@@ -10,6 +10,8 @@
 		B56869BF24A3E77D002AF0C4 /* PDFImageDrawer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56869BE24A3E77D002AF0C4 /* PDFImageDrawer.swift */; };
 		B56869C124A3E9CF002AF0C4 /* PageData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56869C024A3E9CF002AF0C4 /* PageData.swift */; };
 		B56869C324A3F27F002AF0C4 /* PDFTableError+Enum.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56869C224A3F27F002AF0C4 /* PDFTableError+Enum.swift */; };
+		B5B6FA1324A5210A00644506 /* PDFPreviewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5B6FA1224A5210A00644506 /* PDFPreviewVC.swift */; };
+		B5B6FA1524A526B300644506 /* FileManager+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5B6FA1424A526B300644506 /* FileManager+Ext.swift */; };
 		B5BE410E24A0B48300A2078E /* SimplePDFBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = B5BE410C24A0B48300A2078E /* SimplePDFBuilder.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B5BE411B24A0B4B600A2078E /* PDFActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BE411524A0B4B600A2078E /* PDFActions.swift */; };
 		B5BE411C24A0B4B600A2078E /* PDFTextDrawer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BE411624A0B4B600A2078E /* PDFTextDrawer.swift */; };
@@ -31,6 +33,8 @@
 		B56869BE24A3E77D002AF0C4 /* PDFImageDrawer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFImageDrawer.swift; sourceTree = "<group>"; };
 		B56869C024A3E9CF002AF0C4 /* PageData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageData.swift; sourceTree = "<group>"; };
 		B56869C224A3F27F002AF0C4 /* PDFTableError+Enum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PDFTableError+Enum.swift"; sourceTree = "<group>"; };
+		B5B6FA1224A5210A00644506 /* PDFPreviewVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PDFPreviewVC.swift; sourceTree = "<group>"; };
+		B5B6FA1424A526B300644506 /* FileManager+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+Ext.swift"; sourceTree = "<group>"; };
 		B5BE410924A0B48300A2078E /* SimplePDFBuilder.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SimplePDFBuilder.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5BE410C24A0B48300A2078E /* SimplePDFBuilder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SimplePDFBuilder.h; sourceTree = "<group>"; };
 		B5BE410D24A0B48300A2078E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -61,6 +65,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B5B6FA1124A520F000644506 /* PDFViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				B5B6FA1224A5210A00644506 /* PDFPreviewVC.swift */,
+			);
+			path = PDFViewControllers;
+			sourceTree = "<group>";
+		};
 		B5BE40FF24A0B48300A2078E = {
 			isa = PBXGroup;
 			children = (
@@ -82,6 +94,7 @@
 			children = (
 				B5BE410C24A0B48300A2078E /* SimplePDFBuilder.h */,
 				B5BE410D24A0B48300A2078E /* Info.plist */,
+				B5B6FA1124A520F000644506 /* PDFViewControllers */,
 				B5BE411424A0B4B600A2078E /* PDF and Graphics */,
 				B5BE412424A0B63D00A2078E /* Model */,
 				B5BE412824A0B63D00A2078E /* Enums */,
@@ -131,6 +144,7 @@
 			isa = PBXGroup;
 			children = (
 				B5BE414624A0B77B00A2078E /* UIColorExtensions.swift */,
+				B5B6FA1424A526B300644506 /* FileManager+Ext.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -218,6 +232,7 @@
 				B5BE414B24A0B81600A2078E /* TableType+Enum.swift in Sources */,
 				B5BE411C24A0B4B600A2078E /* PDFTextDrawer.swift in Sources */,
 				B5BE414724A0B77B00A2078E /* UIColorExtensions.swift in Sources */,
+				B5B6FA1524A526B300644506 /* FileManager+Ext.swift in Sources */,
 				B5BE413524A0B63D00A2078E /* Alignment+Enum.swift in Sources */,
 				B5BE414924A0B7F600A2078E /* PaperParams+Enum.swift in Sources */,
 				B5BE414D24A0B90300A2078E /* PDFFooterDrawer.swift in Sources */,
@@ -228,6 +243,7 @@
 				B5BE411F24A0B4B600A2078E /* PDFBuilder.swift in Sources */,
 				B5BE413424A0B63D00A2078E /* PDFMargins.swift in Sources */,
 				B5BE414F24A0B9F000A2078E /* PDFFooter.swift in Sources */,
+				B5B6FA1324A5210A00644506 /* PDFPreviewVC.swift in Sources */,
 				B5BE411D24A0B4B600A2078E /* PDFHelpers.swift in Sources */,
 				B56869C324A3F27F002AF0C4 /* PDFTableError+Enum.swift in Sources */,
 				B5BE413A24A0B63D00A2078E /* PDFColumnHeader.swift in Sources */,

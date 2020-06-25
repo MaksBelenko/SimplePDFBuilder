@@ -1,10 +1,29 @@
 //
 //  PDFCreator.swift
-//  PaymentsPDF
+//  SimplePDFBuilder
 //
-//  Created by Maksim on 04/04/2020.
-//  Copyright © 2020 Maksim. All rights reserved.
+//  Created by MaksBelenko on 25/06/2020.
 //
+//  MIT License
+//  Copyright (c) 2020 MaksBelenko
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in all
+//  copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//  SOFTWARE.
 
 import UIKit
 import PDFKit
@@ -257,7 +276,7 @@ public final class PDFBuilder {
      - Parameter font: Font of the text ( Default is .systemFont(ofSize: 12) )
      */
     @discardableResult
-    public func addText(text: String, alignment: Alignment, font: UIFont = .systemFont(ofSize: 11), colour: UIColor = .black) -> PDFBuilder  {
+    public func addText(text: String, alignment: Alignment = .left, font: UIFont = .systemFont(ofSize: 11), colour: UIColor = .black) -> PDFBuilder  {
         pdfActions.addAction { [unowned self] in
             self.currentYOffset = self.checkOffset(forFont: font, offset: self.currentYOffset)
             guard let drawer = self.pdfTextDrawer else { return }
@@ -319,13 +338,13 @@ public final class PDFBuilder {
      - Parameter tableColour: Table colour theme ( Default is .darkGray )
      */
     @discardableResult
-    public func addTable(headers: [PDFColumnHeader], rows: [PDFTableRow], tableType: TableType = .Modern, font: UIFont = .systemFont(ofSize: 11), tableColour: UIColor = .darkGray) throws -> PDFBuilder {
+    public func addTable(headers: [PDFColumnHeader], rows: [PDFTableRow], tableStyle: TableStyle = .Modern, font: UIFont = .systemFont(ofSize: 11), tableColour: UIColor = .darkGray) throws -> PDFBuilder {
         try validate(headers, rows)
         
         pdfActions.addAction { [unowned self] in
             //TODO: Remove startnewpage and add footer method
             guard let drawer = self.pdfTableDrawer else { return }
-            drawer.changeTableType(with: tableType)
+            drawer.changeTableType(with: tableStyle)
             self.currentYOffset = drawer.drawTable(headers: headers, rows: rows, font: font, themeColour: tableColour, top: self.currentYOffset)
         }
         
