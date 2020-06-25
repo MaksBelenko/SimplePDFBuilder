@@ -19,9 +19,9 @@ internal final class PDFImageDrawer {
     
     // MARK: - Deinit
     
-    deinit {
-        print("DEBUG: PDFImageDrawer deinit is called")
-    }
+//    deinit {
+//        print("DEBUG: PDFImageDrawer deinit is called")
+//    }
     
     
     

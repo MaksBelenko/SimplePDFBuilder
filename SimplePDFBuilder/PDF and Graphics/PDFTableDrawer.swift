@@ -34,9 +34,9 @@ internal final class PDFTableDrawer {
     
     // MARK: - Deinit
     
-    deinit {
-        print("DEBUG: PDFTableDrawer deinit is called")
-    }
+//    deinit {
+//        print("DEBUG: PDFTableDrawer deinit is called")
+//    }
     
     func releaseFuncReferences() {
         startNewPage = nil

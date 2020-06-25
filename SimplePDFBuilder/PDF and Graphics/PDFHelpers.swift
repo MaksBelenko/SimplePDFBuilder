@@ -14,9 +14,9 @@ internal final class PDFHelpers {
     
     // MARK: - Deinit
     
-    deinit {
-        print("DEBUG: PDFHelpers deinit is called")
-    }
+//    deinit {
+//        print("DEBUG: PDFHelpers deinit is called")
+//    }
     
     
     // MARK: - Public methods

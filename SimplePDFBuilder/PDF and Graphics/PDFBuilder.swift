@@ -35,11 +35,14 @@ public final class PDFBuilder {
         }
     }
 
-    /// Spacing of the document (Default is 1.08)
-    public var lineSpacing: CGFloat = 1.08 { // Word default spacing
+    /// Global spacing of the document (Default is 1.08).
+    ///
+    /// If you want to change the spacing only for the next
+    /// elements consider using changeTextSpacing method
+    public var textSpacing: CGFloat = 1.08 { // Word's default spacing
         didSet {
-            if (lineSpacing < 0) {
-                lineSpacing = 0
+            if (textSpacing < 0) {
+                textSpacing = 0
             }
         }
     }
@@ -92,11 +95,11 @@ public final class PDFBuilder {
     
     // MARK: - Deinit
     
-    deinit {
-        #if DEBUG
-            print("DEBUG: PDFBuilder deinit is called")
-        #endif
-    }
+//    deinit {
+//        #if DEBUG
+//            print("DEBUG: PDFBuilder deinit is called")
+//        #endif
+//    }
     
     
     // MARK: - Initalisation
@@ -109,7 +112,8 @@ public final class PDFBuilder {
     //MARK: - PDF Creation
 
     /**
-    Creates PDF file data
+     Creates PDF file data
+     - Returns: PDF data
     */
     public func build() -> Data {
         let pdfMetaData = [ kCGPDFContextCreator: metaCreator,
@@ -127,7 +131,7 @@ public final class PDFBuilder {
             
             initialiseObjects()
             
-            context.beginPage() //new page
+            context.beginPage() //start first page
             self.pdfActions.generatePDF()
             
             pdfFooterDrawer?.drawFooterIfNeeded()
@@ -160,7 +164,8 @@ public final class PDFBuilder {
      Allows to hold PDF line offset, therefore next objects will be drawn on the same line
      
      If you will set for PDF to hold the line, it means that all the next objects (text, images, etc.., except "addSpace")
-     will be drawn on the same line as the object before "holdPDFLine" method was executed
+     will be drawn on the same line. As an example, you can use it to draw texts on left and right and they will be drawn
+     on the same line.
      */
     @discardableResult
     public func holdLine() -> PDFBuilder {
@@ -231,6 +236,19 @@ public final class PDFBuilder {
     }
     
     
+    /**
+     Change spacing for the next elements
+     - Parameter spacing: A new spacing for the text
+     */
+    @discardableResult
+    public func changeTextSpacing(to spacing: CGFloat) -> PDFBuilder {
+        pdfActions.addAction { [unowned self] in
+            self.textSpacing = spacing
+        }
+        
+        return self
+    }
+    
     
     /**
      Adds single line of text to PDF
@@ -243,7 +261,8 @@ public final class PDFBuilder {
         pdfActions.addAction { [unowned self] in
             self.currentYOffset = self.checkOffset(forFont: font, offset: self.currentYOffset)
             guard let drawer = self.pdfTextDrawer else { return }
-            let spacing = self.lineSpacing * self.getCurrentFontHeight(forFont: font)
+            
+            let spacing = (self.textSpacing < 1) ? 0 : self.textSpacing * self.getCurrentFontHeight(forFont: font) - 1
             self.currentYOffset = drawer.drawText(text: text, font: font, color: colour, lineSpacing: spacing, alignment: alignment, top: self.currentYOffset)
 
             self.holdTmpYOffset = self.checkOffset(forFont: self.currentFont, offset: self.holdTmpYOffset)
@@ -351,7 +370,7 @@ public final class PDFBuilder {
     
     private func checkOffset(forFont font: UIFont, offset: CGFloat) -> CGFloat {
         if (offset != pageMargins.top) {
-            return offset + lineSpacing * getCurrentFontHeight(forFont: font)
+            return offset + textSpacing * getCurrentFontHeight(forFont: font)
         }
         return offset
     }

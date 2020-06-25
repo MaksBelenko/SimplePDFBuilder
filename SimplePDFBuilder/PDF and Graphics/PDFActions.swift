@@ -16,9 +16,9 @@ internal final class PDFActions {
     
     // MARK: - Deinit
     
-    deinit {
-        print("DEBUG: PDFActions deinit is called")
-    }
+//    deinit {
+//        print("DEBUG: PDFActions deinit is called")
+//    }
     
     
     // MARK: - Public methods

@@ -20,9 +20,9 @@ internal final class PDFTextDrawer {
     
     // MARK: - Deinit
     
-    deinit {
-        print("DEBUG: PDFTextDrawer deinit is called")
-    }
+//    deinit {
+//        print("DEBUG: PDFTextDrawer deinit is called")
+//    }
     
     
     
@@ -46,9 +46,9 @@ internal final class PDFTextDrawer {
         let bottom: CGFloat
         
         if (pageWidth > textWidth) {
-            bottom = drawSingleLineText(text: text, font: font, alignment: alignment, top: top)
+            bottom = drawSingleLineText(text: text, textColour: color, font: font, alignment: alignment, top: top)
         } else {
-            bottom = drawWrappingText(text: text, font: font, lineSpacing: lineSpacing, alignment: alignment.nsTextAlignment(), top: top)
+            bottom = drawWrappingText(text: text, color: color, font: font, lineSpacing: lineSpacing, alignment: alignment.nsTextAlignment(), top: top)
         }
         
         return bottom
@@ -86,11 +86,11 @@ internal final class PDFTextDrawer {
      Use to add text that is long and therefore might be wrapped
      - Parameter text: Text that should be presented
      - Parameter font: Font of the text to be shown
-     - Parameter lineSpacing: Spacing between the lines
+     - Parameter textSpacing: Spacing between the lines
      - Parameter alignment: Alignment of the text
      - Parameter top: Top Offset
      */
-    private func drawWrappingText(text: String, font: UIFont, color: UIColor = .black, lineSpacing: CGFloat, alignment: NSTextAlignment,  top: CGFloat) -> CGFloat {
+    private func drawWrappingText(text: String, color: UIColor = .black, font: UIFont, lineSpacing: CGFloat, alignment: NSTextAlignment,  top: CGFloat) -> CGFloat {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .natural
         paragraphStyle.lineBreakMode = .byWordWrapping
