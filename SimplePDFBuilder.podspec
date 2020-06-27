@@ -15,8 +15,7 @@ Pod::Spec.new do |spec|
   spec.author       = { "MaksBelenko" => "maksim.belenko@gmail.com" }
   spec.platform     = :ios, "13.0"
 
-  spec.source       = { :path => '.' }
-#{ :git => "https://github.com/MaksBelenko/SimplePDFBuilder.git", :tag => "#{spec.version}" }
+  spec.source       = { :git => "https://github.com/MaksBelenko/SimplePDFBuilder.git", :tag => "#{spec.version}" }
 
   spec.source_files = "SimplePDFBuilder/**/*.{h,m,swift}"
 
