@@ -8,6 +8,7 @@ Simple tool to create complex PDF files easily.
 
 
 ## Table of Contents
+- [Installation](#Installation)
 - [How to use PDFBuilder](#PDF-Document-parameters)
     - [PDF Document parameters](#PDF-Document-parameters)
     - [Adding Text](#Adding-Text)
@@ -20,6 +21,27 @@ Simple tool to create complex PDF files easily.
 - [How to use built-in PDF Preview View Controller](#How-to-use-built-in-PDF-Preview-View-Controller)
 - [How to create a custom PDF Preview](#How-to-create-a-custom-PDF-Preview)
 - [License](#License)
+
+
+
+
+
+
+## Installation
+
+If you are new to cocoapods [read this first](https://guides.cocoapods.org/using/using-cocoapods.html).
+
+Firstly go to _terminal_ and naviigate to your project. Then execute command `pod init` and open created `Podfile`.
+
+You want to add _pod 'SimplePDFBuilder', '~> 0.1'_:
+```ruby
+target 'YourAppName' do
+  pod 'SimplePDFBuilder', '~> 0.1'
+end
+```
+Then run a `pod install` inside your terminal.
+
+After installation make sure you open `.xcworkspace` project and **NOT** `.xcodeproj`
 
 
 
