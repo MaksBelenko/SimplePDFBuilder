@@ -30,21 +30,22 @@ import PDFKit
 
 public final class PDFBuilder {
 
-    // MARK: - Public fields
+   
+    // MARK: - Private fields
     
     /// Name of the creator in PDF Metadata
-    public var metaCreator: String = "Unknown"
+    private var metaCreator: String = "Unknown"
     /// Name of the author in PDF Metadata
-    public var metaAuthor: String = "Unknown"
+    private var metaAuthor: String = "Unknown"
     /// Name of the title in PDF Metadata
-    public var metaTitle: String = "Unknown Title"
+    private var metaTitle: String = "Unknown"
 
     /// Paper size (Default is .A4)
-    public var paperSize: PaperSize = .A4
+    private var paperSize: PaperSize = .A4
     /// Paper orientation (Deafult is .Portrait)
-    public var paperOrientation: PaperOrientation = .Portrait
+    private var paperOrientation: PaperOrientation = .Portrait
     /// Paper margins type (Default is .Normal)
-    public var paperMargins: PaperMargins = .Normal {
+    private var paperMargins: PaperMargins = .Normal {
         didSet {
             pageMargins = pdfHelper.marginsLookup(forMargins: paperMargins)
             pdfTextDrawer?.pageMargins = pageMargins
@@ -55,10 +56,7 @@ public final class PDFBuilder {
     }
 
     /// Global spacing of the document (Default is 1.08).
-    ///
-    /// If you want to change the spacing only for the next
-    /// elements consider using changeTextSpacing method
-    public var textSpacing: CGFloat = 1.08 { // Word's default spacing
+    private var textSpacing: CGFloat = 1.08 { // Word's default spacing
         didSet {
             if (textSpacing < 0) {
                 textSpacing = 0
@@ -66,8 +64,6 @@ public final class PDFBuilder {
         }
     }
     
-    
-    // MARK: - Private fields
     
     // Page margins containing top, left, right and bottom margins
     private var pageMargins = PDFMargins(top: 72, left: 72, right: 72, bottom: 72) //Inch each
@@ -180,6 +176,103 @@ public final class PDFBuilder {
     
     
     /**
+     Adds Author meta data to the PDF (default is "Unknown")
+     
+     This is a global setting, only the last accurance will determine
+     the meta author.
+     - Parameter metaAuthor: Author's name
+     */
+    @discardableResult
+    public func withMetaAuthor(_ metaAuthor: String) -> PDFBuilder {
+        self.metaAuthor = metaAuthor
+        return self
+    }
+    
+    
+    /**
+     Adds Creator meta data to the PDF (default is "Unknown")
+     
+     This is a global setting, only the last accurance will determine
+     the meta creator.
+     - Parameter metaCreator: Author's name
+     */
+    @discardableResult
+    public func withMetaCreator(_ metaCreator: String) -> PDFBuilder {
+        self.metaCreator = metaCreator
+        return self
+    }
+    
+    
+    /**
+     Adds Title meta data to the PDF (default is "Unknown")
+     
+     This is a global setting, only the last accurance will determine
+     the meta title.
+     - Parameter metaTitle: Meta Title of the PDF
+     */
+    @discardableResult
+    public func withMetaTitle(_ metaTitle: String) -> PDFBuilder {
+        self.metaTitle = metaTitle
+        return self
+    }
+    
+    
+    /**
+     Change paper size for the next elements you will be adding (from .A1 to .A7, Default is .A4)
+     - Parameter paperSize: Paper size type
+     */
+    @discardableResult
+    public func withPaperSize(_ paperSize: PaperSize) -> PDFBuilder {
+        pdfActions.addAction { [unowned self] in
+            self.paperSize = paperSize
+        }
+        
+        return self
+    }
+    
+    /**
+     Change paper orientation of the PDF. It can be .Album or .Portrait (default)
+     
+     This is a global setting, only the last accurance will determine
+     the paper orientation of the document.
+     - Parameter orientation: Paper orientation
+     */
+    @discardableResult
+    public func withPaperOrientation(_ orientation: PaperOrientation) -> PDFBuilder {
+        self.paperOrientation = orientation
+        return self
+    }
+    
+    
+    /**
+     Change paper margins for the next elements you will be adding
+     - Parameter margins: Paper margin type
+     */
+    @discardableResult
+    public func withPaperMargins(_ margins: PaperMargins) -> PDFBuilder {
+        pdfActions.addAction { [unowned self] in
+            self.paperMargins = margins
+        }
+        
+        return self
+    }
+    
+    
+    /**
+     Change spacing for the next elements
+     - Parameter spacing: A new spacing for the text
+     */
+    @discardableResult
+    public func withTextSpacing(_ spacing: CGFloat) -> PDFBuilder {
+        pdfActions.addAction { [unowned self] in
+            self.textSpacing = spacing
+        }
+        
+        return self
+    }
+    
+    
+    /**
      Allows to hold PDF line offset, therefore next objects will be drawn on the same line
      
      If you will set for PDF to hold the line, it means that all the next objects (text, images, etc.., except "addSpace")
@@ -235,34 +328,6 @@ public final class PDFBuilder {
         pdfActions.addAction { [unowned self] in
             let height = centimeters * 2.54 * 72
             self.currentYOffset += height
-        }
-        
-        return self
-    }
-    
-    
-    /**
-     Change paper margins for the next elements you will be adding
-     - Parameter margins: Paper margin type
-     */
-    @discardableResult
-    public func changePaperMargins(to margins: PaperMargins) -> PDFBuilder {
-        pdfActions.addAction { [unowned self] in
-            self.paperMargins = margins
-        }
-        
-        return self
-    }
-    
-    
-    /**
-     Change spacing for the next elements
-     - Parameter spacing: A new spacing for the text
-     */
-    @discardableResult
-    public func changeTextSpacing(to spacing: CGFloat) -> PDFBuilder {
-        pdfActions.addAction { [unowned self] in
-            self.textSpacing = spacing
         }
         
         return self

@@ -30,7 +30,7 @@ import PDFKit
 
 public class PDFPreviewVC: UIViewController {
     
-    private var pdfView: PDFView!
+    private var pdfView = PDFView()
     
     private var pdfData: Data?
     private var pdfFileName: String!
@@ -98,7 +98,6 @@ public class PDFPreviewVC: UIViewController {
     
     
     func setupPDFView() {
-        pdfView = PDFView()
         pdfView.backgroundColor = .white
         
         view.addSubview(pdfView)
