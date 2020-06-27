@@ -61,7 +61,7 @@ To build pdf data:
 </tr>
 </table>
 
-_pdfData_ contains the data of the PDF which is used in PDFView's document property of PDFKit. See section [How to create a custom PDF Preview] for more information.(#How-to-create-a-custom-PDF-Preview) for more details
+_pdfData_ contains the data of the PDF which is used in PDFView's document property of PDFKit. See section [How to create a custom PDF Preview](#How-to-create-a-custom-PDF-Preview) for more information.
 
 
 
