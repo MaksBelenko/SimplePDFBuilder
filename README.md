@@ -4,7 +4,7 @@
 Simple tool to create complex PDF files easily.
 
 ## Introduction
-`SimplePDFBuilder` is a library built on top of PDFKit and which enables you to easily create PDF files in your app. This is a customisable library that allows you to add text, images and other elements including complex tables, making the creation of PDF files very simple, with no need to draw everything from scratch.
+`SimplePDFBuilder` is a library built on top of PDFKit which enables you to easily create PDF files in your app. This is a customisable library that allows you to add text, images and other elements including complex tables, making the creation of PDF files very simple, with no need to draw everything from scratch.
 
 
 ## Table of Contents
@@ -31,7 +31,7 @@ Simple tool to create complex PDF files easily.
 
 If you are new to cocoapods [read this first](https://guides.cocoapods.org/using/using-cocoapods.html).
 
-Firstly go to _terminal_ and naviigate to your project. Then execute command `pod init` and open created `Podfile`.
+Firstly, go to _terminal_ and navigate to your project. Then execute command `pod init` and open the created `Podfile`.
 
 You want to add _pod 'SimplePDFBuilder', '~> 0.1'_:
 ```ruby
@@ -39,7 +39,7 @@ target 'YourAppName' do
   pod 'SimplePDFBuilder', '~> 0.1'
 end
 ```
-Then run a `pod install` inside your terminal.
+Then run `pod install` inside your terminal.
 
 After installation make sure you open `.xcworkspace` project and **NOT** `.xcodeproj`
 
@@ -50,7 +50,7 @@ After installation make sure you open `.xcworkspace` project and **NOT** `.xcode
 
 
 ## How to use PDFBuilder
-In order to create a simple PDF file with no content on it, you need to import SimplePDFBuilder where you want to use it: 
+In order to create a simple PDF file with no content in it, you need to import SimplePDFBuilder where you want to use it: 
 
 ```swift
 import SimplePDFBuilder
@@ -93,7 +93,7 @@ _pdfData_ contains the data of the PDF which is used in PDFView's document prope
 
 In order to add metadata to your PDF File use the following:
 
-<sup>_(Example shows a creation of empty PDF file with Meta Data)_</sup>
+<sup>_(Example shows a creation of an empty PDF file with Meta Data)_</sup>
 ```swift
 let data = PDFBuilder()
             .withMetaAuthor("AuthorName")
@@ -105,7 +105,7 @@ let data = PDFBuilder()
 
 There are a few additional parameters that can be set:
 
-<sup>_(Example shows a creation of empty PDF file with default parameters)_</sup>
+<sup>_(Example shows a creation of an empty PDF file with default parameters)_</sup>
 
 ```swift         
 let pdf = PDFBuilder()
@@ -335,9 +335,9 @@ The library comes with a built-in controller called `PDFPreviewVC`. It is shown 
 ```swift
 let pdf = PDFBuilder()
 
-pdf.metaAuthor = "Maks"
-pdf.metaCreator = "Maks"
-pdf.metaTitle = "My PDF"
+pdf.wihMetaAuthor("Maks")
+pdf.withMetaCreator("Maks")
+pdf.withMetaTitle("My PDF")
 
 pdf.addFooter(pagingEnabled: true,
               text: "© Company copyrights reserved footer.",
